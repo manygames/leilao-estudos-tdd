@@ -1,5 +1,6 @@
 package br.com.alura.leilao.model;
 
+import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,6 +12,13 @@ import br.com.alura.leilao.exception.LanceMenorQueUltimoLanceException;
 import br.com.alura.leilao.exception.LanceSeguidoDeMesmoUsuarioException;
 import br.com.alura.leilao.exception.UsuarioJaDeuCincoLancesException;
 
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.*;
 
 public class LeilaoTest {
@@ -25,14 +33,14 @@ public class LeilaoTest {
     @Test
     public void deve_DevolverDescricao_QuandoRecebeDescricao() {
         String descricaoDevolvida = CONSOLE.getDescricao();
-        assertEquals("Console", descricaoDevolvida);
+        assertThat(descricaoDevolvida, is("Console"));
     }
 
     @Test
     public void deve_DevolverMaiorLance_QuandoRecebeApenasUmLance() {
-        CONSOLE.propoe(new Lance(WEBER, 200));
+        CONSOLE.propoe(new Lance(WEBER, 200.0));
         double maiorLanceDevolvido = CONSOLE.getMaiorLance();
-        assertEquals(200, maiorLanceDevolvido, DELTA);
+        assertThat(maiorLanceDevolvido, closeTo(200.0, DELTA));
     }
 
     @Test
@@ -68,13 +76,11 @@ public class LeilaoTest {
 
         List<Lance> tresMaioresLancesDevolvidos = CONSOLE.tresMaioresLances();
 
-        assertEquals(3, tresMaioresLancesDevolvidos.size());
-        assertEquals(400.0,
-                tresMaioresLancesDevolvidos.get(0).getValor(), DELTA);
-        assertEquals(300.0,
-                tresMaioresLancesDevolvidos.get(1).getValor(), DELTA);
-        assertEquals(200.0,
-                tresMaioresLancesDevolvidos.get(2).getValor(), DELTA);
+        assertThat(tresMaioresLancesDevolvidos,
+                both(Matchers.<Lance>hasSize(3)).and(contains(
+                        new Lance(WEBER, 400.0),
+                        new Lance(new Usuario("Joice"), 300.0),
+                        new Lance(WEBER, 200.0))));
     }
 
     @Test
